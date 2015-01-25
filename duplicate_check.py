@@ -1,6 +1,6 @@
 __author__ = 'jslowik'
 import argparse, hashlib, csv, os, time#, magic
-from datetime import date
+from datetime import date, datetime
 
 #Purpose: pass a directory as a command-line argument
 #Recurse through the directory creating a list of files by type (file output),
@@ -29,14 +29,25 @@ def recurseThroughDirectory(directory, hash):
         print("Must supply directory to search!")
         exit()
     else:
-        fileList = {}
+        fileList = []
         for dirpath, dirnames, filenames in os.walk(directory):
-            fullPath = str.join(dirpath,filenames)
-            hashValue = fileHash(fullPath, hash)
-            fileType = "null" #add in call to function using python-magic lib
-            lastModTime = os.path.getmtime(fullPath)
-            fileList.append((filenames,hashValue,fileType,lastModTime))
+            #print(dirpath)
+            for file in filenames:
+                fullPath = dirpath + file
+                #print(fullPath)
+                hashValue = fileHash(fullPath, hash)
+                #print(hashValue)
+                fileType = "null" #add in call to function using python-magic lib
+                rawTime = os.path.getmtime(fullPath)
+                lastModTime = convertTime(rawTime)
+                dataEntry=[file,hashValue,fileType,lastModTime]
+                fileList.append(dataEntry)
         return fileList
+
+def convertTime(mtime):
+    #dateTimeObject = datetime.datetime.fromtimestamp(mtime)
+    dateTimeObject = datetime.fromtimestamp(mtime)
+    return dateTimeObject.strftime("%y-%m-%d-%H:%M")
 
 def createFileList(tempLocation, fileList):
     if not tempLocation or not fileList:
@@ -44,12 +55,13 @@ def createFileList(tempLocation, fileList):
     else:
         if not tempLocation.endswith("/"): tempLocation = tempLocation + "/"
         dateStamp = date.today().strftime("%y_%m_%d")
+        #print(dateStamp)
         fileName = tempLocation + dateStamp + "_tmp.csv"
-        print fileName
-        with open(fileName, 'w', newline='') as csvFile:
+        #print(fileName)
+        with open(fileName, 'w') as csvFile:
             csvWriter = csv.writer(csvFile, delimiter=',')
-            for line in fileList:
-                csvWriter.writerow(line)
+            for item in fileList:
+                csvWriter.writerow(item)
 
 if __name__ == '__main__':
     parser=argumentParser()
