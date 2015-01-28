@@ -1,5 +1,5 @@
 __author__ = 'jslowik'
-import argparse, hashlib, csv, os, time#, magic
+import argparse, hashlib, csv, os, magic#, magic
 from datetime import date, datetime
 
 #Purpose: pass a directory as a command-line argument
@@ -42,7 +42,7 @@ def recurseThroughDirectory(directory, hash):
                 #print(fullPath)
                 hashValue = fileHash(fullPath, hash)
                 #print(hashValue)
-                fileType = "null" #add in call to function using python-magic lib
+                fileType = magic.from_file(fullPath)
                 rawTime = os.path.getmtime(fullPath)
                 lastModTime = convertTime(rawTime)
                 dataEntry=[file,hashValue,fileType,lastModTime]
