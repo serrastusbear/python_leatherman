@@ -19,10 +19,15 @@ def argumentParser():
     return parser.parse_args()
 
 def fileHash(file, arg):
-    if arg:
-        return hashlib.sha1(file).hexdigest()
-    else:
-        return hashlib.md5(file).hexdigest()
+    blocksize=65536
+    if arg: hasher = hashlib.sha1()
+    if not arg: hasher = hashlib.md5()
+    with open(file, 'rb') as afile:
+        buf = afile.read(blocksize)
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = afile.read(blocksize)
+    return hasher.hexdigest()
 
 def recurseThroughDirectory(directory, hash):
     if not directory:
@@ -47,14 +52,14 @@ def recurseThroughDirectory(directory, hash):
 def convertTime(mtime):
     #dateTimeObject = datetime.datetime.fromtimestamp(mtime)
     dateTimeObject = datetime.fromtimestamp(mtime)
-    return dateTimeObject.strftime("%y-%m-%d-%H:%M")
+    return dateTimeObject.strftime("%Y-%m-%d-%H:%M")
 
 def createFileList(tempLocation, fileList):
     if not tempLocation or not fileList:
         pass
     else:
         if not tempLocation.endswith("/"): tempLocation = tempLocation + "/"
-        dateStamp = date.today().strftime("%y_%m_%d")
+        dateStamp = date.today().strftime("%Y_%m_%d")
         #print(dateStamp)
         fileName = tempLocation + dateStamp + "_tmp.csv"
         #print(fileName)
