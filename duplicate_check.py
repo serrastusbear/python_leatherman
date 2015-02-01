@@ -54,6 +54,23 @@ def convertTime(mtime):
     dateTimeObject = datetime.fromtimestamp(mtime)
     return dateTimeObject.strftime("%Y-%m-%d-%H:%M")
 
+def createNoDuplicateList(fileName,order):
+    fileList={}
+    with open(fileName,'r') as csvFile:
+        csvReader = csv.reader(csvFile,delimiter=',')
+        for row in csvReader:
+            key = row['1'] + '-' + row['2']
+            date = row['3']
+            if( fileList.has_key(key)):
+                existingDate = fileList[key]
+                if not order:
+                    oldest=min(existingDate,date)
+                    fileList[key]=oldest
+                else:
+                    newest=max(existingDate,date)
+                    fileList[key]=newest
+    return fileList
+
 def createFileList(tempLocation, fileList):
     if not tempLocation or not fileList:
         pass
