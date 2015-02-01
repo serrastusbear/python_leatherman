@@ -62,13 +62,15 @@ def createNoDuplicateList(fileName,order):
             key = row['1'] + '-' + row['2']
             date = row['3']
             if( fileList.has_key(key)):
-                existingDate = fileList[key]
+                file,hashValue,fileType,existingDate = fileList[key].split(',')
                 if not order:
                     oldest=min(existingDate,date)
-                    fileList[key]=oldest
+                    fileList[key]=file+','+hashValue+','+fileType+','+oldest
                 else:
                     newest=max(existingDate,date)
-                    fileList[key]=newest
+                    fileList[key]=file+','+hashValue+','+fileType+','+newest
+            else:
+                fileList[key] = row
     return fileList
 
 def createFileList(tempLocation, fileList):
